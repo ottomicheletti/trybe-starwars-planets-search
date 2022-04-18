@@ -2,19 +2,79 @@ import React, { useContext, useState, useEffect } from 'react';
 import { StarWarsContext } from '../contexts/StarWarsContext';
 
 const Filters = () => {
-  const { data, setFilteredPlanets } = useContext(StarWarsContext);
+  const { data, setFilteredPlanets, filteredPlanets } = useContext(StarWarsContext);
   const [filters, setFilters] = useState({
     filterByName: {
       name: '',
     },
+    filterByNumericValues: [],
+  });
+  const [currentFilters, setCurrentFilters] = useState({
+    column: 'population',
+    comparison: 'maior que',
+    value: '0',
   });
 
-  useEffect(
-    () => setFilteredPlanets(
+  const COLUMNS = [
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ];
+  const COMPARISONS = ['maior que', 'menor que', 'igual a'];
+
+  useEffect(() => {
+    setFilteredPlanets(
       data.filter((planet) => planet.name.includes(filters.filterByName.name)),
-    ),
-    [data, filters, setFilteredPlanets],
-  );
+    );
+  }, [data, filters.filterByName, setFilteredPlanets]);
+
+  useEffect(() => {
+    switch (currentFilters.comparison) {
+    case 'maior que':
+      return setFilteredPlanets(
+        filteredPlanets.filter(
+          (planet) => parseInt(planet[currentFilters.column], 10)
+              > parseInt(currentFilters.value, 10),
+        ),
+      );
+    case 'menor que':
+      return setFilteredPlanets(
+        filteredPlanets.filter(
+          (planet) => parseInt(planet[currentFilters.column], 10)
+              < parseInt(currentFilters.value, 10),
+        ),
+      );
+    case 'igual a':
+      return setFilteredPlanets(
+        filteredPlanets.filter(
+          (planet) => parseInt(planet[currentFilters.column], 10)
+              === parseInt(currentFilters.value, 10),
+        ),
+      );
+    default:
+      return undefined;
+    }
+  }, [filters.filterByNumericValues]);
+
+  const onChange = ({ target: { name, value } }) => {
+    setCurrentFilters((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    setFilters((prevState) => ({
+      ...prevState,
+      filterByNumericValues: [
+        ...prevState.filterByNumericValues,
+        currentFilters,
+      ],
+    }));
+  };
 
   return (
     <div>
@@ -27,7 +87,46 @@ const Filters = () => {
           filterByName: { name: value },
         })) }
       />
-      {/* <form action="submit">TESTE</form> */}
+      <div>
+        {filters.filterByNumericValues.map((filter, index) => (
+          <div key={ index }>
+            <p>{`${filter.column} ${filter.comparison} ${filter.value}`}</p>
+            <button type="button">Deletar Filtro</button>
+          </div>
+        ))}
+      </div>
+      <form action="submit">
+        <select
+          data-testid="column-filter"
+          name="column"
+          onChange={ onChange }
+          defaultValue="population"
+        >
+          {COLUMNS.map((value, index) => (
+            <option key={ index }>{value}</option>
+          ))}
+        </select>
+        <select
+          data-testid="comparison-filter"
+          name="comparison"
+          onChange={ onChange }
+          defaultValue="maior que"
+        >
+          {COMPARISONS.map((value, index) => (
+            <option key={ index }>{value}</option>
+          ))}
+        </select>
+        <input
+          type="number"
+          data-testid="value-filter"
+          name="value"
+          onChange={ onChange }
+          defaultValue="0"
+        />
+        <button type="submit" data-testid="button-filter" onClick={ onSubmit }>
+          Filtrar
+        </button>
+      </form>
     </div>
   );
 };
