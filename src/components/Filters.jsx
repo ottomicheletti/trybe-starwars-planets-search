@@ -15,13 +15,13 @@ const Filters = () => {
     value: '0',
   });
 
-  const COLUMNS = [
+  const [columns, setColumns] = useState([
     'population',
     'orbital_period',
     'diameter',
     'rotation_period',
     'surface_water',
-  ];
+  ]);
   const COMPARISONS = ['maior que', 'menor que', 'igual a'];
 
   useEffect(() => {
@@ -74,7 +74,10 @@ const Filters = () => {
         currentFilters,
       ],
     }));
+    setColumns(columns.filter((column) => column !== currentFilters.column));
   };
+
+  const { filterByNumericValues } = filters;
 
   return (
     <div>
@@ -88,7 +91,7 @@ const Filters = () => {
         })) }
       />
       <div>
-        {filters.filterByNumericValues.map((filter, index) => (
+        {filterByNumericValues.map((filter, index) => (
           <div key={ index }>
             <p>{`${filter.column} ${filter.comparison} ${filter.value}`}</p>
             <button type="button">Deletar Filtro</button>
@@ -102,8 +105,8 @@ const Filters = () => {
           onChange={ onChange }
           defaultValue="population"
         >
-          {COLUMNS.map((value, index) => (
-            <option key={ index }>{value}</option>
+          {columns.map((column, index) => (
+            <option key={ index }>{column}</option>
           ))}
         </select>
         <select
