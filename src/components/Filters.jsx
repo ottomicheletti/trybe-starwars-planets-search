@@ -1,21 +1,19 @@
-import React, { useContext, useState, useEffect } from "react";
-import { StarWarsContext } from "../contexts/StarWarsContext";
+import React, { useContext, useState, useEffect } from 'react';
+import { StarWarsContext } from '../contexts/StarWarsContext';
 
 const Filters = () => {
-  const { data, filteredPlanets, setFilteredPlanets } =
-    useContext(StarWarsContext);
+  const { data, setFilteredPlanets } = useContext(StarWarsContext);
   const [filters, setFilters] = useState({
     filterByName: {
-      name: "",
+      name: '',
     },
   });
 
   useEffect(
-    () =>
-      setFilteredPlanets(
-        data.filter((planet) => planet.name.includes(filters.filterByName.name))
-      ),
-    [filters]
+    () => setFilteredPlanets(
+      data.filter((planet) => planet.name.includes(filters.filterByName.name)),
+    ),
+    [data, filters, setFilteredPlanets],
   );
 
   return (
@@ -24,12 +22,10 @@ const Filters = () => {
       <input
         type="text"
         data-testid="name-filter"
-        onChange={({ target: { value } }) =>
-          setFilters((prevState) => ({
-            ...prevState,
-            filterByName: { name: value },
-          }))
-        }
+        onChange={ ({ target: { value } }) => setFilters((prevState) => ({
+          ...prevState,
+          filterByName: { name: value },
+        })) }
       />
       {/* <form action="submit">TESTE</form> */}
     </div>

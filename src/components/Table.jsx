@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { StarWarsContext } from "../contexts/StarWarsContext";
+import React, { useContext } from 'react';
+import { StarWarsContext } from '../contexts/StarWarsContext';
 
 const Table = () => {
   const { data, filteredPlanets } = useContext(StarWarsContext);
@@ -13,21 +13,19 @@ const Table = () => {
           <thead>
             <tr>
               {Object.keys(data[0]).map((key, index) => (
-                <th key={index}>
-                  {key === "url"
+                <th key={ index }>
+                  {key === 'url'
                     ? key.toUpperCase()
                     : key
-                        .replace("_", " ")
-                        .replace(/^[a-z]{1}|\s\S/g, (caracter) =>
-                          caracter.toUpperCase()
-                        )}
+                      .replace('_', ' ')
+                      .replace(/^[a-z]{1}|\s\S/g, (caracter) => caracter.toUpperCase())}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filteredPlanets.map((planet, index) => (
-              <tr key={index}>
+              <tr key={ index }>
                 <td>{planet.name}</td>
                 <td>{planet.rotation_period}</td>
                 <td>{planet.orbital_period}</td>

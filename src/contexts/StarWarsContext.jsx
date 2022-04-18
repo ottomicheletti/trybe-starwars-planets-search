@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useMemo } from "react";
-import PropTypes from "prop-types";
+import React, { createContext, useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 export const StarWarsContext = createContext(null);
 
@@ -9,7 +9,7 @@ export const StarWarsProvider = ({ children }) => {
 
   const fetchPlanets = async () => {
     const response = await fetch(
-      "https://swapi-trybe.herokuapp.com/api/planets/?format=json"
+      'https://swapi-trybe.herokuapp.com/api/planets/?format=json',
     );
     const { results } = await response.json();
     const newPlanets = results.filter((planet) => delete planet.residents);
@@ -27,7 +27,7 @@ export const StarWarsProvider = ({ children }) => {
       filteredPlanets,
       setFilteredPlanets,
     }),
-    [data, filteredPlanets]
+    [data, filteredPlanets],
   );
 
   StarWarsProvider.propTypes = {
@@ -35,6 +35,6 @@ export const StarWarsProvider = ({ children }) => {
   };
 
   return (
-    <StarWarsContext.Provider value={memo}>{children}</StarWarsContext.Provider>
+    <StarWarsContext.Provider value={ memo }>{children}</StarWarsContext.Provider>
   );
 };
