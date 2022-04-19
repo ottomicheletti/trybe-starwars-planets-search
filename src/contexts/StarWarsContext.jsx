@@ -12,7 +12,8 @@ export const StarWarsProvider = ({ children }) => {
       'https://swapi-trybe.herokuapp.com/api/planets/?format=json',
     );
     const { results } = await response.json();
-    const newPlanets = results.filter((planet) => delete planet.residents);
+    const newPlanets = results.filter((planet) => delete planet.residents)
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: false }));
     setFilteredPlanets(newPlanets);
     return setData(newPlanets);
   };

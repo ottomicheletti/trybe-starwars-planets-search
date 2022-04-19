@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { createNewSortInstance } from 'fast-sort';
 import { StarWarsContext } from '../contexts/StarWarsContext';
 
 const Filters = () => {
@@ -8,13 +9,16 @@ const Filters = () => {
       name: '',
     },
     filterByNumericValues: [],
+    order: {
+      column: 'population',
+      sort: 'ASC',
+    },
   });
   const [currentFilters, setCurrentFilters] = useState({
     column: 'population',
     comparison: 'maior que',
     value: '0',
   });
-
   const [columns, setColumns] = useState({
     population: true,
     orbital_period: true,
@@ -37,19 +41,16 @@ const Filters = () => {
     },
   };
   const { filterByNumericValues } = filters;
-
   const numericFilters = () => {
     filterByNumericValues.map(({ comparison, column, value }, index) => (
       COMPARISONS[comparison](column, value, index)
     ));
   };
-
   useEffect(() => {
     setFilteredPlanets(
       data.filter((planet) => planet.name.includes(filters.filterByName.name)),
     );
   }, [filters.filterByName]);
-
   useEffect(() => {
     if (!filterByNumericValues[0]) {
       setFilteredPlanets([...data]);
@@ -57,14 +58,12 @@ const Filters = () => {
       numericFilters();
     }
   }, [filters.filterByNumericValues]);
-
   const onChange = ({ target: { name, value } }) => {
     setCurrentFilters((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
-
   const handleClick = ({ target: { value, name } }) => {
     switch (name) {
     case 'delete':
@@ -106,6 +105,26 @@ const Filters = () => {
       break;
     default:
       break;
+    }
+  };
+  const changeOrder = ({ target: { value } }) => {
+    setFilters((prevState) => (
+      { ...prevState,
+        order: {
+          column: prevState.order.column,
+          sort: value },
+      }));
+  };
+  const naturalSort = createNewSortInstance({
+    comparer: new Intl.Collator(undefined, { numeric: true }).compare,
+  });
+  const handleOrder = () => {
+    if (filters.order.sort === 'ASC') {
+      setFilteredPlanets(naturalSort(filteredPlanets)
+        .asc((el) => Number(el[filters.order.column]) || 0));
+    } else {
+      setFilteredPlanets(naturalSort(filteredPlanets)
+        .desc((el) => Number(el[filters.order.column]) || 0));
     }
   };
 
@@ -178,6 +197,48 @@ const Filters = () => {
           onClick={ handleClick }
         >
           Remover Filtragens
+        </button>
+      </form>
+      <form>
+        <select
+          onChange={ ({ target: { value } }) => setFilters((prevState) => (
+            { ...prevState, order: { column: value, sort: prevState.order.sort } })) }
+          data-testid="column-sort"
+        >
+          {Object.keys(columns).map((column, index) => (
+            <option key={ index }>{column}</option>
+          ))}
+        </select>
+        <div>
+          <label htmlFor="ASC">
+            <input
+              type="radio"
+              name="ASC"
+              value="ASC"
+              checked={ filters.order.sort === 'ASC' }
+              onChange={ changeOrder }
+              data-testid="column-sort-input-asc"
+            />
+            Ascendente
+          </label>
+          <label htmlFor="DESC">
+            <input
+              type="radio"
+              name="DESC"
+              value="DESC"
+              checked={ filters.order.sort === 'DESC' }
+              onChange={ changeOrder }
+              data-testid="column-sort-input-desc"
+            />
+            Descendente
+          </label>
+        </div>
+        <button
+          type="button"
+          onClick={ handleOrder }
+          data-testid="column-sort-button"
+        >
+          Ordenar
         </button>
       </form>
     </div>
